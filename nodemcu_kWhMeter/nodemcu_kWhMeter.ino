@@ -18,14 +18,12 @@ const byte COLS = 4; // Set the number of Columns
 //     {'B', '6', '5', '4'},
 //     {'A', '3', '2', '1'}};
 
-
 // Set the Key at Use (4x4)
-char keys [ROWS] [COLS] = {
-  {'D', 'C', 'B', 'A'},
-  {'#', '9', '6', '3'},
-  {'0', '8', '5', '2'},
-  {'*', '7', '4', '1'}
-};
+char keys[ROWS][COLS] = {
+    {'D', 'C', 'B', 'A'},
+    {'#', '9', '6', '3'},
+    {'0', '8', '5', '2'},
+    {'*', '7', '4', '1'}};
 
 // define active Pin (4x4)
 byte rowPins[ROWS] = {0, 1, 2, 3}; // Connect to Keyboard Row Pin
@@ -41,7 +39,6 @@ byte colPins[COLS] = {4, 5, 6, 7}; // Connect to Pin column of keypad.
 Keypad_I2C keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2CADDR, PCF8574);
 
 int eeAddress = 0; // eeprom eddress
-
 
 int relayPinOut = 2;
 int contact = 0;
@@ -59,7 +56,7 @@ unsigned long period = 1000;
 int getNextkey = 0;
 
 PZEM004Tv30 pzem(14, 12);
-float energy; //kWh
+float energy; // kWh
 float power;  // Watt
 // float token_spent; // satuan kWh
 float token_remaining = 0.00; //  token Value satuan kWh
@@ -68,15 +65,15 @@ float pricePerkWh = 0.00; // price per kWh
 
 int xadd = 2;
 
-// BUZZER
-int pinBuzzer= 13;
+// BUZZER dsdsddsdss
+int pinBuzzer = 13;
 
 void setup()
 {
   Serial.begin(115200);
-  EEPROM.begin(512);
-  while (!Serial) ;
-  //keypad setup
+  while (!Serial)
+    ;
+  // keypad setup
   Wire.begin();                   // Call the connection Wire
   keypad.begin(makeKeymap(keys)); // Call the connection
 
@@ -86,20 +83,21 @@ void setup()
   lcd.backlight();
   lcd.setCursor(0, 0);
   lcd.print("Kamar : 1.A");
-  //relaysetup
+  // relaysetup
   pinMode(relayPinOut, OUTPUT);
   digitalWrite(relayPinOut, LOW);
 
   startMillis = millis();
-  //Get the float data from the EEPROM at position 'eeAddress'     
-  Serial.print("Read TOken from eeprom: ");
-  String token_saveddata;
-  token_saveddata = EEPROM_get(10);
-  token_remaining = token_saveddata.toFloat();
-//  EEPROM.get(eeAddress, token_remaining);
-  Serial.println(token_remaining, 3); //This may print 'ovf, nan' if the data inside the EEPROM is not a valid float.
-  pinMode(pinBuzzer, OUTPUT);
 
+  // Get the float data from the EEPROM at position 'eeAddress'
+  EEPROM.begin(512);
+  float token_saveddata;
+  eeAddress += EEPROM.get(eeAddress, token_remaining);
+  //  EEPROM.get(eeAddress, token_remaining);
+  //  token_remaining = token_saveddata
+  Serial.println(token_remaining, 3); // This may print 'ovf, nan' if the data inside the EEPROM is not a valid float.
+
+  pinMode(pinBuzzer, OUTPUT);
 }
 
 void loop()
@@ -107,8 +105,8 @@ void loop()
   currentMillis = millis();
   // int xaddy = xadd += 1;
   // Serial.println(xaddy);
-  energy = pzem.energy() ;
-  // Serial.print("Read energy: ");  
+  energy = pzem.energy();
+  // Serial.print("Read energy: ");
   // Serial.print(energy);
   Serial.println(token_remaining);
   power = pzem.power();
@@ -120,7 +118,7 @@ void loop()
   {
     if (!isnan(energy))
     {
-      token_remaining2 = token_remaining - energy;      
+      token_remaining2 = token_remaining - energy;
       Serial.print("Read TOken: ");
       Serial.println(token_remaining2);
       if (token_remaining2 <= 0)
@@ -129,8 +127,8 @@ void loop()
         lcd.print("                     ");
         lcd.setCursor(0, 1);
         lcd.print("token habis");
-      }      
-      else if ((token_remaining2 <= 5) && (token_remaining2 > 0)) //harus disesuaikan lagi
+      }
+      else if ((token_remaining2 <= 5) && (token_remaining2 > 0)) // harus disesuaikan lagi
       {
         digitalWrite(pinBuzzer, HIGH);
         delay(1000);
@@ -144,7 +142,6 @@ void loop()
         lcd.setCursor(8, 1);
         lcd.print(token_remaining2, token_remainingDecimalValue);
         lcd.print("kWh");
-        
       }
       else
       {
@@ -251,7 +248,7 @@ void menu1()
       token_remaining = 0.00;
       String tokendataeeprom = String(token_remaining, 3);
       EEPROM_put(10, tokendataeeprom);
-//      EEPROM.put(eeAddress, token_remaining);
+      //      EEPROM.put(eeAddress, token_remaining);
     }
     else if (key == 'B')
     {
@@ -259,7 +256,7 @@ void menu1()
       String tokendataeeprom = String(token_remaining2, 3);
       token_remaining = token_remaining2;
       EEPROM_put(10, tokendataeeprom);
-//      EEPROM.put(eeAddress, token_remaining);
+      //      EEPROM.put(eeAddress, token_remaining);
     }
   }
 }
@@ -306,12 +303,12 @@ void menu2()
       inputInt = inputString.toFloat();
       token_remaining = token_remaining + inputInt;
       token_remaining2 = token_remaining;
-      
+
       String tokendataeeprom = String(token_remaining, 3);
       EEPROM_put(10, tokendataeeprom);
-      
-//      Serial.println(token_remaining2);
-//      EEPROM.put(eeAddress, token_remaining);
+
+      //      Serial.println(token_remaining2);
+      //      EEPROM.put(eeAddress, token_remaining);
       getNextkey == 0;
       period = 1000;
       break;
@@ -356,18 +353,18 @@ void EEPROM_put(char add, String data)
   {
     EEPROM.write(add + i, data[i]);
   }
-  EEPROM.write(add + _size, '\0'); //Add termination null character for String Data
+  EEPROM.write(add + _size, '\0'); // Add termination null character for String Data
   EEPROM.commit();
 }
 
 String EEPROM_get(char add)
 {
   int i;
-  char data[10]; //Max 100 Bytes
+  char data[10]; // Max 100 Bytes
   int len = 0;
   unsigned char k;
   k = EEPROM.read(add);
-  while (k != '\0' && len < 500) //Read until null character
+  while (k != '\0' && len < 500) // Read until null character
   {
     k = EEPROM.read(add + len);
     data[len] = k;
