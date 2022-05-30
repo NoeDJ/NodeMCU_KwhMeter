@@ -62,6 +62,7 @@ float power;  // Watt
 float token_remaining = 0.00; //  token Value satuan kWh
 float token_remaining2;
 float pricePerkWh = 0.00; // price per kWh
+// float token_saveddata;
 
 int xadd = 2;
 
@@ -91,11 +92,7 @@ void setup()
 
   // Get the float data from the EEPROM at position 'eeAddress'
   EEPROM.begin(512);
-  float token_saveddata;
   eeAddress += EEPROM.get(eeAddress, token_remaining);
-  //  EEPROM.get(eeAddress, token_remaining);
-  //  token_remaining = token_saveddata
-  Serial.println(token_remaining, 3); // This may print 'ovf, nan' if the data inside the EEPROM is not a valid float.
 
   pinMode(pinBuzzer, OUTPUT);
 }
@@ -118,6 +115,7 @@ void loop()
   {
     if (!isnan(energy))
     {
+      menu1();
       token_remaining2 = token_remaining - energy;
       Serial.print("Read TOken: ");
       Serial.println(token_remaining2);
@@ -175,7 +173,6 @@ void loop()
   {
     digitalWrite(relayPinOut, LOW);
   }
-  menu1();
   // Serial.println(token_remaining);
   // Serial.println(token_remaining2);
 }
@@ -247,7 +244,8 @@ void menu1()
     {
       token_remaining = 0.00;
       String tokendataeeprom = String(token_remaining, 3);
-      EEPROM_put(10, tokendataeeprom);
+      eeAddress += EEPROM.get(eeAddress, token_remaining);
+      // EEPROM_put(10, tokendataeeprom);
       //      EEPROM.put(eeAddress, token_remaining);
     }
     else if (key == 'B')
@@ -255,7 +253,8 @@ void menu1()
       token_remaining2 = 10.00;
       String tokendataeeprom = String(token_remaining2, 3);
       token_remaining = token_remaining2;
-      EEPROM_put(10, tokendataeeprom);
+      eeAddress += EEPROM.get(eeAddress, token_remaining);
+      // EEPROM_put(10, tokendataeeprom);
       //      EEPROM.put(eeAddress, token_remaining);
     }
   }
@@ -305,7 +304,9 @@ void menu2()
       token_remaining2 = token_remaining;
 
       String tokendataeeprom = String(token_remaining, 3);
-      EEPROM_put(10, tokendataeeprom);
+
+      eeAddress += EEPROM.get(eeAddress, token_remaining);
+      // EEPROM_put(10, tokendataeeprom);
 
       //      Serial.println(token_remaining2);
       //      EEPROM.put(eeAddress, token_remaining);
